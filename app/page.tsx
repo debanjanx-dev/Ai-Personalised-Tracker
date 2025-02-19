@@ -1,13 +1,18 @@
+import Navbar from './components/Navbar';
 import Button from './components/ui/Button';
+import { WavyBackground } from './components/ui/wavy-background';
 
 export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
+      <Navbar/>
       <section className="py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <WavyBackground>
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-8">
             <h1 className="text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+
               Supercharge Your Learning with AI-Powered Insights
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -23,7 +28,9 @@ export default function Home() {
             </div>
           </div>
         </div>
+        </WavyBackground>
       </section>
+
 
       {/* Features Section */}
       <section className="py-20 px-4">
