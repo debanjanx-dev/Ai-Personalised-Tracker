@@ -45,9 +45,9 @@ const Navbar = () => {
 
           {/* Right Side - Login Button */}
           <div className="hidden md:flex items-center flex-shrink-0">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8">
-              <Link href="/login" className="w-full">Login</Link>
-            </Button>
+          <button className="px-6 py-2 rounded-xl border border-neutral-600 text-black bg-white hover:bg-gray-100 transition duration-200">
+       Login
+      </button>
           </div>
 
           {/* Mobile Menu Button */}
