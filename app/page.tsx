@@ -3,6 +3,7 @@ import Button from './components/ui/Button';
 import { WavyBackground } from './components/ui/wavy-background';
 import { FeaturesSectionDemo } from './components/Features-Section';
 import { Timeline } from './components/ui/timeline';
+import { Spotlight } from './components/ui/spotlight-new';
 
 const timelineData = [
   {
@@ -60,9 +61,13 @@ export default function Home() {
       <section className="pt-24">
         <WavyBackground className="max-w-6xl mx-auto px-4">
           <div className="text-center space-y-8">
-            <h1 className="text-5xl font-bold tracking-tight sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100">
-              Supercharge Your Learning with AI-Powered Insights
-            </h1>
+            <div className="relative">
+              <Spotlight>
+                <h1 className="text-5xl font-bold tracking-tight sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100">
+                  Supercharge Your Learning with AI-Powered Insights
+                </h1>
+              </Spotlight>
+            </div>
             <p className="text-xl font-medium text-gray-300 max-w-2xl mx-auto">
               Track your progress, get personalized recommendations, and achieve your learning goals faster with AI assistance.
             </p>
