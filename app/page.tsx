@@ -136,16 +136,7 @@ export default function Home() {
       </section>
 
       {/* Footer Section */}
-      <footer className="py-8 px-4 border-t border-gray-800">
-        <div className="text-center">
-          <p className="text-gray-400">
-            Made with{" "}
-            <span className="text-red-500 animate-pulse">❤</span>
-            {" "}by{" "}
-            <span className="text-blue-400 font-medium">Debanjan Mukherjee</span>
-          </p>
-        </div>
-      </footer>
+      
     </main>
   );
 }

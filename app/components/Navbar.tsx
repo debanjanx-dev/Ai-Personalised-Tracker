@@ -3,51 +3,41 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { usePathname } from 'next/navigation';
 
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu";
 import Button from "./ui/Button";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <nav className="bg-black dark:bg-gray-900 shadow-md w-full fixed top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+    <nav className="fixed top-0 w-full z-50 bg-black/50 backdrop-blur-xl border-b border-neutral-800">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
           {/* Left Side - Logo */}
-          <Link href="/" className="text-2xl font-bold text-blue-600 dark:text-white flex-shrink-0">
-            StudySync 🚀
+          <Link href="/" className="text-xl font-bold text-white">
+            StudySync
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8 flex-grow justify-center">
-            <Link href="/" className="text-gray-200 hover:text-blue-500 transition-colors font-medium">Home</Link>
-            <Link href="/features" className="text-gray-200 hover:text-blue-500 transition-colors font-medium">Features</Link>
-            <Link href="/dashboard" className="text-gray-200 hover:text-blue-500 transition-colors font-medium">Dashboard</Link>
-
-            {/* Dropdown Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="transparent" className="flex items-center gap-1 text-gray-200">
-                  More <ChevronDown size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48">
-                <DropdownMenuItem>
-                  <Link href="/about" className="w-full py-1">About</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/contact" className="w-full py-1">Contact</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          {/* Right Side - Login Button */}
-          <div className="hidden md:flex items-center flex-shrink-0">
-          <button className="px-6 py-2 rounded-xl border border-neutral-600 text-black bg-white hover:bg-gray-100 transition duration-200">
-       Login
-      </button>
+          <div className="flex items-center gap-6">
+            <Link 
+              href="/" 
+              className={`text-sm ${pathname === '/' ? 'text-white' : 'text-gray-300 hover:text-white'} transition-colors`}
+            >
+              Home
+            </Link>
+            <Link 
+              href="/dashboard" 
+              className={`text-sm ${pathname === '/dashboard' ? 'text-white' : 'text-gray-300 hover:text-white'} transition-colors`}
+            >
+              Dashboard
+            </Link>
+            <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+              Sign In
+            </button>
           </div>
 
           {/* Mobile Menu Button */}

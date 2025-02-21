@@ -28,6 +28,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <footer className="py-8 px-4  bg-black">
+        <div className="text-center bf">
+          <p className="text-gray-400">
+            Made with{" "}
+            <span className="text-red-500 animate-pulse">❤</span>
+            {" "}by{" "}
+            <span className="text-blue-400 font-medium">Debanjan Mukherjee</span>
+          </p>
+        </div>
+      </footer>
       </body>
     </html>
   );
