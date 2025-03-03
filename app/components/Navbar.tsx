@@ -16,7 +16,7 @@ const Navbar = () => {
   const { isSignedIn, user } = useUser();
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-black/50 backdrop-blur-xl border-b border-neutral-800">
+    <nav className="fixed top-0 w-full z-50 bg-black border-b border-neutral-800">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Logo */}
@@ -32,14 +32,14 @@ const Navbar = () => {
             >
               Home
             </Link>
-            <Link 
-              href="/dashboard" 
-              className={`text-sm ${pathname === '/dashboard' ? 'text-white' : 'text-gray-300 hover:text-white'} transition-colors`}
-            >
-              Dashboard
-            </Link>
             {isSignedIn ? (
               <div className="flex items-center gap-4">
+                <Link 
+                  href="/dashboard" 
+                  className={`text-sm ${pathname === '/dashboard' ? 'text-white' : 'text-gray-300 hover:text-white'} transition-colors`}
+                >
+                  Dashboard
+                </Link>
                 <Link 
                   href="/user-profile" 
                   className={`text-sm ${pathname === '/user-profile' ? 'text-white' : 'text-gray-300 hover:text-white'} transition-colors`}
@@ -49,17 +49,12 @@ const Navbar = () => {
                 <UserButton afterSignOutUrl="/" />
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center">
                 <SignInButton mode="modal">
-                  <button className="text-gray-300 hover:text-white text-sm px-4 py-2 rounded-lg transition-colors">
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-lg transition-colors">
                     Sign In
                   </button>
                 </SignInButton>
-                <SignUpButton mode="modal">
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-lg transition-colors">
-                    Sign Up
-                  </button>
-                </SignUpButton>
               </div>
             )}
           </div>
@@ -87,22 +82,20 @@ const Navbar = () => {
           </div>
           <div className="px-4 py-4 space-y-2">
             {isSignedIn ? (
-              <Link href="/user-profile" className="block w-full bg-gray-800 hover:bg-gray-700 text-white text-center py-2.5 rounded-md transition-colors">
-                My Profile
-              </Link>
-            ) : (
               <>
-                <SignInButton mode="modal">
-                  <button className="block w-full bg-gray-800 hover:bg-gray-700 text-white text-center py-2.5 rounded-md transition-colors">
-                    Sign In
-                  </button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <button className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 rounded-md transition-colors">
-                    Sign Up
-                  </button>
-                </SignUpButton>
+                <Link href="/dashboard" className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 rounded-md transition-colors">
+                  Dashboard
+                </Link>
+                <Link href="/user-profile" className="block w-full bg-gray-800 hover:bg-gray-700 text-white text-center py-2.5 rounded-md transition-colors">
+                  My Profile
+                </Link>
               </>
+            ) : (
+              <SignInButton mode="modal">
+                <button className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 rounded-md transition-colors">
+                  Sign In
+                </button>
+              </SignInButton>
             )}
           </div>
         </div>

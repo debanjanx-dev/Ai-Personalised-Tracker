@@ -12,6 +12,7 @@
     "@clerk/nextjs": "^6.12.2",
     "@google/generative-ai": "^0.21.0",
     "@gsap/react": "^2.1.2",
+    "@heroui/react": "^2.7.4",
     "@neondatabase/serverless": "^0.10.4",
     "@radix-ui/react-dropdown-menu": "^2.1.6",
     "@tabler/icons-react": "^3.30.0",

@@ -5,6 +5,8 @@ import { Spotlight } from '../components/ui/spotlight-new';
 import { useTasksAndInsights } from '../hooks/useTasksAndInsights';
 import { format, isPast } from 'date-fns';
 import { useUser } from '@clerk/nextjs';
+import { Spinner } from '@heroui/react';
+
 
 export default function Dashboard() {
   const { user, isLoaded } = useUser();
@@ -26,7 +28,7 @@ export default function Dashboard() {
 
   if (!isLoaded || loading) return (
     <div className="flex items-center justify-center h-screen bg-black">
-      <div className="text-white">Loading...</div>
+       <Spinner classNames={{label: "text-white mt-4"}} label="Loading..." variant="wave" color="primary" />
     </div>
   );
 
