@@ -1,5 +1,7 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Navbar from "./components/Navbar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,17 +29,23 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <footer className="py-8 px-4  bg-black">
-        <div className="text-center bf">
-          <p className="text-gray-400">
-            Made with{" "}
-            <span className="text-red-500 animate-pulse">❤</span>
-            {" "}by{" "}
-            <span className="text-blue-400 font-medium">Debanjan Mukherjee</span>
-          </p>
-        </div>
-      </footer>
+        {/* @ts-expect-error - ClerkProvider is a valid Server Component */}
+        <ClerkProvider>
+          <Navbar />
+          <main className="min-h-[calc(100vh-60px)] pt-16">
+            {children}
+          </main>
+        </ClerkProvider>
+        <footer className="py-8 px-4 bg-black">
+          <div className="text-center bf">
+            <p className="text-gray-400">
+              Made with{" "}
+              <span className="text-red-500 animate-pulse">❤</span>
+              {" "}by{" "}
+              <span className="text-blue-400 font-medium">Debanjan Mukherjee</span>
+            </p>
+          </div>
+        </footer>
       </body>
     </html>
   );

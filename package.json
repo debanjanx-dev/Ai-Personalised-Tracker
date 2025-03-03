@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.12.2",
     "@google/generative-ai": "^0.21.0",
     "@gsap/react": "^2.1.2",
     "@neondatabase/serverless": "^0.10.4",
     "@radix-ui/react-dropdown-menu": "^2.1.6",
     "@tabler/icons-react": "^3.30.0",
+    "@types/next-auth": "^3.13.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cobe": "^0.6.3",
@@ -25,6 +27,7 @@
     "lucide-react": "^0.475.0",
     "motion": "^12.4.6",
     "next": "15.1.7",
+    "next-auth": "^4.24.11",
     "openai": "^4.85.1",
     "pg": "^8.13.3",
     "react": "^19.0.0",

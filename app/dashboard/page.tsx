@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import { Spotlight } from '../components/ui/spotlight-new';
-import Navbar from '../components/Navbar';
 import { useTasksAndInsights } from '../hooks/useTasksAndInsights';
 import { format, isPast } from 'date-fns';
+import { useUser } from '@clerk/nextjs';
 
 export default function Dashboard() {
+  const { user, isLoaded } = useUser();
   const { tasks, insights, loading, error, addTask, deleteTask } = useTasksAndInsights();
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', description: '', due_date: '' });
@@ -23,27 +24,20 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) return (
-    <main className="min-h-screen bg-black">
-      <Navbar />
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-white">Loading...</div>
-      </div>
-    </main>
+  if (!isLoaded || loading) return (
+    <div className="flex items-center justify-center h-screen bg-black">
+      <div className="text-white">Loading...</div>
+    </div>
   );
 
   if (error) return (
-    <main className="min-h-screen bg-black">
-      <Navbar />
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-red-500">Error: {error}</div>
-      </div>
-    </main>
+    <div className="flex items-center justify-center h-screen bg-black">
+      <div className="text-red-500">Error: {error}</div>
+    </div>
   );
 
   return (
     <main className="min-h-screen bg-black">
-      <Navbar />
       
       {/* Dashboard Header */}
       <section className="pt-28 pb-8 px-4">
@@ -52,7 +46,7 @@ export default function Dashboard() {
             <div className="relative">
               <Spotlight>
                 <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600">
-                  Your Learning Dashboard
+                  {user ? `${user.firstName}'s Dashboard` : 'Your Learning Dashboard'}
                 </h1>
               </Spotlight>
             </div>

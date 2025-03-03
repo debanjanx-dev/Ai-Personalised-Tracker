@@ -1,4 +1,4 @@
-import Navbar from './components/Navbar';
+import Link from 'next/link';
 import Button from './components/ui/Button';
 import { WavyBackground } from './components/ui/wavy-background';
 import { FeaturesSectionDemo } from './components/Features-Section';
@@ -55,7 +55,6 @@ const timelineData = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-black">
-      <Navbar />
       
       {/* Hero Section */}
       <section className="pt-24">
@@ -72,18 +71,18 @@ export default function Home() {
               Track your progress, get personalized recommendations, and achieve your learning goals faster with AI assistance.
             </p>
             <div className="flex justify-center gap-4 pb-12">
-              <button className="relative inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
+              <Link href="/sign-up" className="relative inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
                 <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
                 <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-6 py-1 text-base font-medium text-white backdrop-blur-3xl hover:bg-slate-900 transition-colors">
                   Get Started
                 </span>
-              </button>
-              <button className="relative inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
+              </Link>
+              <Link href="/dashboard" className="relative inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
                 <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
                 <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-white px-6 py-1 text-base font-medium text-slate-950 backdrop-blur-3xl hover:bg-gray-50 transition-colors">
-                  Learn More
+                  Dashboard
                 </span>
-              </button>
+              </Link>
             </div>
           </div>
         </WavyBackground>
@@ -126,12 +125,12 @@ export default function Home() {
           <p className="text-xl text-gray-300 mb-8 font-medium">
             Join thousands of learners who are already benefiting from AI-powered insights.
           </p>
-          <button className="relative inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
+          <Link href="/sign-up" className="relative inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
             <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
             <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-1 text-base font-medium text-white backdrop-blur-3xl hover:bg-slate-900 transition-colors">
-              Start Free Trial
+              Sign Up Now
             </span>
-          </button>
+          </Link>
         </div>
       </section>
 
