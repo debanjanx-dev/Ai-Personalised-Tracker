@@ -1,10 +1,10 @@
-import { query } from '@/lib/db';
+import { query  , db} from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
     // Fetch tasks from the database
-    const result = await query("SELECT * FROM tasks ORDER BY created_at DESC");
+    const result = await db.query("SELECT * FROM tasks ORDER BY created_at DESC");
     return NextResponse.json({ tasks: result.rows });
   } catch (error) {
     console.error("Error fetching tasks:", error);
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     }
 
     // Insert new task into database
-    const result = await query(
+    const result = await db.query(
       "INSERT INTO tasks (title, description, due_date) VALUES ($1, $2, $3) RETURNING *",
       [title, description, due_date]
     );

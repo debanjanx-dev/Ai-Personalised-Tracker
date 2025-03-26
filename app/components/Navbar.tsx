@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Home, BookOpen, StickyNote, Settings, BarChart } from "lucide-react";
 import { usePathname } from 'next/navigation';
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
@@ -15,6 +15,25 @@ const Navbar = () => {
   const pathname = usePathname();
   const { isSignedIn, user } = useUser();
 
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
+
+  const isActive = (path: string) => {
+    return pathname === path;
+  };
+
+  const navItems = [
+    { name: 'Home', path: '/', icon: <Home className="h-5 w-5" /> },
+    { name: 'Dashboard', path: '/dashboard', icon: <BarChart className="h-5 w-5" /> },
+    { name: 'Exams', path: '/exams', icon: <BookOpen className="h-5 w-5" /> },
+    { name: 'Notes', path: '/notes', icon: <StickyNote className="h-5 w-5" /> },
+  ];
+
   return (
     <nav className="fixed top-0 w-full z-50 bg-black border-b border-neutral-800">
       <div className="max-w-7xl mx-auto px-4">
@@ -25,26 +44,24 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Menu */}
-          <div className="flex items-center gap-6">
-            <Link 
-              href="/" 
-              className={`text-sm ${pathname === '/' ? 'text-white' : 'text-gray-300 hover:text-white'} transition-colors`}
-            >
-              Home
-            </Link>
+          <div className="hidden md:flex items-center gap-6">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                href={item.path}
+                className={`text-sm flex items-center ${isActive(item.path) ? 'text-white' : 'text-gray-300 hover:text-white'} transition-colors`}
+              >
+                <span className="inline-block mr-2">{item.icon}</span>
+                <span>{item.name}</span>
+              </Link>
+            ))}
             {isSignedIn ? (
               <div className="flex items-center gap-4">
                 <Link 
-                  href="/dashboard" 
-                  className={`text-sm ${pathname === '/dashboard' ? 'text-white' : 'text-gray-300 hover:text-white'} transition-colors`}
-                >
-                  Dashboard
-                </Link>
-                <Link 
                   href="/user-profile" 
-                  className={`text-sm ${pathname === '/user-profile' ? 'text-white' : 'text-gray-300 hover:text-white'} transition-colors`}
+                  className={`text-sm flex items-center ${pathname === '/user-profile' ? 'text-white' : 'text-gray-300 hover:text-white'} transition-colors`}
                 >
-                  Profile
+                  <span>Profile</span>
                 </Link>
                 <UserButton afterSignOutUrl="/" />
               </div>
@@ -62,7 +79,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button 
             className="md:hidden text-gray-200 hover:text-blue-500 transition-colors p-2" 
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={toggleMenu}
             aria-label="Toggle menu"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -74,11 +91,21 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden bg-black dark:bg-gray-900 border-t border-gray-800 py-2">
           <div className="space-y-1 px-4">
-            <Link href="/" className="block py-2.5 text-gray-200 hover:text-blue-500 transition-colors">Home</Link>
-            <Link href="/features" className="block py-2.5 text-gray-200 hover:text-blue-500 transition-colors">Features</Link>
-            <Link href="/dashboard" className="block py-2.5 text-gray-200 hover:text-blue-500 transition-colors">Dashboard</Link>
-            <Link href="/about" className="block py-2.5 text-gray-200 hover:text-blue-500 transition-colors">About</Link>
-            <Link href="/contact" className="block py-2.5 text-gray-200 hover:text-blue-500 transition-colors">Contact</Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                href={item.path}
+                className={`flex items-center px-3 py-2 text-base font-medium ${
+                  isActive(item.path)
+                    ? 'bg-gray-800 text-white'
+                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                }`}
+                onClick={closeMenu}
+              >
+                <span className="inline-block mr-3">{item.icon}</span>
+                <span>{item.name}</span>
+              </Link>
+            ))}
           </div>
           <div className="px-4 py-4 space-y-2">
             {isSignedIn ? (

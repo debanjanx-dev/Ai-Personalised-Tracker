@@ -57,7 +57,7 @@ export default function Home() {
     <main className="min-h-screen bg-black">
       
       {/* Hero Section */}
-      <section className="pt-24">
+      <section className="pt-18">
         <WavyBackground className="max-w-6xl mx-auto px-4">
           <div className="text-center space-y-8">
             <div className="relative">
