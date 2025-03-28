@@ -14,11 +14,12 @@ type Context = {
 
 export async function GET(
   request: NextRequest,
-  context: Context 
+  context: Promise<Context> 
 ) {
   try {
     const { userId } = getAuth(request);
-    const { slug } = context.params; // Use slug instead of id
+    const resolvedContext = await context;
+    const { slug } = resolvedContext.params;
     
     if (!userId) {
       return NextResponse.json(
@@ -30,7 +31,7 @@ export async function GET(
     // Fetch exam from the database using db.query instead of query
     const examResult = await db.query(
       "SELECT * FROM public.exams WHERE id = $1 AND user_id = $2",
-      [slug, userId] // Use slug instead of id
+      [slug, userId]
     );
 
     if (examResult.rows.length === 0) {
@@ -72,11 +73,12 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: Context
+  context: Promise<Context>
 ) {
   try {
     const { userId } = getAuth(request);
-    const { slug } = context.params; // Use slug instead of id
+    const resolvedContext = await context;
+    const { slug } = resolvedContext.params;
     
     if (!userId) {
       return NextResponse.json(
