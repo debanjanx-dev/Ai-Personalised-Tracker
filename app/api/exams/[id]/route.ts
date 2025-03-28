@@ -5,13 +5,19 @@ import { db } from '@/lib/db';
 import { getAuth } from '@clerk/nextjs/server';
 import { NextRequest } from 'next/server';
 
+type Props = {
+  params : {
+      id : string;
+  };
+};
+
 export async function GET(
   request: NextRequest,
-  context: any
+  {params}: Props
 ) {
   try {
     const { userId } = getAuth(request);
-    const id = context.params.id;
+    const id = params.id;
     
     if (!userId) {
       return NextResponse.json(
@@ -65,11 +71,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: any
+  {params}: Props
 ) {
   try {
     const { userId } = getAuth(request);
-    const { id } = context.params;
+    const id = params.id;
     
     if (!userId) {
       return NextResponse.json(
@@ -122,11 +128,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: any
+  {params}: Props
 ) {
   try {
     const { userId } = getAuth(request);
-    const { id } = context.params;
+    const { id } = params;
     
     if (!userId) {
       return NextResponse.json(
