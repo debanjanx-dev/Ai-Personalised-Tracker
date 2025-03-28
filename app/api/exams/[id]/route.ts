@@ -70,7 +70,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: Context
+  context: any
 ) {
   try {
     const { userId } = getAuth(request);
@@ -127,7 +127,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: Context
+  context: any
 ) {
   try {
     const { userId } = getAuth(request);
