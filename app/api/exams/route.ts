@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 
-
+//@ts-ignore
 export async function GET(request: NextRequest) {
   try {
     // Get the authenticated user using getAuth with the request
