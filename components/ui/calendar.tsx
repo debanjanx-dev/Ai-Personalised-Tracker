@@ -54,8 +54,9 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        // @ts-ignore - These properties exist in react-day-picker but TypeScript doesn't recognize them
+        IconLeft: () => <ChevronLeft className="h-4 w-4" />,
+        IconRight: () => <ChevronRight className="h-4 w-4" />,
       }}
       {...props}
     />
@@ -63,4 +64,4 @@ function Calendar({
 }
 Calendar.displayName = "Calendar"
 
-export { Calendar } 
+export { Calendar }

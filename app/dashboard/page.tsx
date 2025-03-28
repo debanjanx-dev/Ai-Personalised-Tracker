@@ -32,7 +32,7 @@ import {
 
 export default function Dashboard() {
   const { user, isLoaded } = useUser();
-  const { tasks, insights, loading, error, addTask, deleteTask } = useTasksAndInsights();
+  const {  insights } = useTasksAndInsights();
   const [showAddExam, setShowAddExam] = useState(false);
   const [exams, setExams] = useState<Exam[]>([]);
   const [loadingExams, setLoadingExams] = useState(true);

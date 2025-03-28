@@ -2,18 +2,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, ChevronDown, Home, BookOpen, StickyNote, Settings, BarChart } from "lucide-react";
+import { Menu, X, Home, BookOpen, StickyNote, BarChart } from "lucide-react";
 import { usePathname } from 'next/navigation';
-import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { SignInButton, UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu";
-import Button from "./ui/Button";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);

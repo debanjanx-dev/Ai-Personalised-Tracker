@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { format } from 'date-fns';
-import { 
-  BookOpen, 
+import {  
   Plus, 
   Search, 
   Tag, 
@@ -13,7 +12,6 @@ import {
   Calendar, 
   Clock,
   GraduationCap,
-  Sparkles,
   X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

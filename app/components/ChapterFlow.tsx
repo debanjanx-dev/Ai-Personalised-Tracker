@@ -10,14 +10,13 @@ import ReactFlow, {
   Position,
   NodeChange,
   EdgeChange,
-  Connection,
   ConnectionMode,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, BookOpen, ArrowRight, AlertCircle, Lightbulb } from "lucide-react";
+import { Clock, BookOpen, AlertCircle, Lightbulb } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 

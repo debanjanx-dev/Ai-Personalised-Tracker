@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Node, Edge, NodeChange, EdgeChange, Connection } from 'reactflow';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card";
+import { Node, Edge } from 'reactflow';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, ArrowLeft, Save, Calendar, Clock, BookOpen, School, Lightbulb } from "lucide-react";
+import { AlertCircle, ArrowLeft, Save, Calendar, Clock, BookOpen, School } from "lucide-react";
 import { format, differenceInDays } from 'date-fns';
 import StudyInsights from '@/app/components/StudyInsights';
 import React from 'react';
