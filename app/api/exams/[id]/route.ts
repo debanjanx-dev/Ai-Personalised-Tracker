@@ -3,14 +3,20 @@ import { db } from '@/lib/db';
 import { getAuth } from '@clerk/nextjs/server';
 import { NextRequest } from 'next/server';
 
-// Update the type definition to match Next.js App Router expectations
+// Define context type
+type Context = {
+  params: {
+    id: string;
+  };
+};
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: Context
 ) {
   try {
     const { userId } = getAuth(request);
-    const { id } = params;
+    const { id } = context.params;
     
     if (!userId) {
       return NextResponse.json(
@@ -64,11 +70,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: Context
 ) {
   try {
     const { userId } = getAuth(request);
-    const { id } = params;
+    const { id } = context.params;
     
     if (!userId) {
       return NextResponse.json(
@@ -121,11 +127,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: Context
 ) {
   try {
     const { userId } = getAuth(request);
-    const { id } = params;
+    const { id } = context.params;
     
     if (!userId) {
       return NextResponse.json(
