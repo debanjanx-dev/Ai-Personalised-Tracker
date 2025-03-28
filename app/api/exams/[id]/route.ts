@@ -4,13 +4,15 @@ import { NextResponse, NextRequest } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuth } from '@clerk/nextjs/server';
 
+
+
 export async function GET(
   request: NextRequest,
-  context: { params: Record<string, string> }
+  { params }: { params: Promise<{ id: string }>}
 ) {
   try {
     const { userId } = getAuth(request);
-    const id = context.params.id;
+    const id =  (await params).id;
     
     if (!userId) {
       return NextResponse.json(
