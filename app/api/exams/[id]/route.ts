@@ -12,7 +12,7 @@ type Context = {
 
 export async function GET(
   request: NextRequest,
-  context: Context
+  context: any 
 ) {
   try {
     const { userId } = getAuth(request);
