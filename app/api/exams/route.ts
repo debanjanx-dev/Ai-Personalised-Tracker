@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from '@clerk/nextjs/server';
-import { NextRequest } from 'next/server';
+import { db } from '@/lib/db';
+
 
 export async function GET(request: NextRequest) {
   try {
+    // Get the authenticated user using getAuth with the request
     const { userId } = getAuth(request);
     
     if (!userId) {
@@ -13,18 +14,19 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       );
     }
-
-    // Fetch exams from the database using db.query instead of query
+    
+    // Get all exams for the user using direct SQL query
     const result = await db.query(
-      "SELECT * FROM public.exams WHERE user_id = $1 ORDER BY created_at DESC",
+      "SELECT * FROM exams WHERE user_id = $1 ORDER BY created_at DESC",
       [userId]
     );
-
+    
+    // Return with "exams" property to match what the frontend expects
     return NextResponse.json({ exams: result.rows });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching exams:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch exams' },
+      { error: `Failed to fetch exams: ${error.message}` },
       { status: 500 }
     );
   }
@@ -32,6 +34,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Get the authenticated user using getAuth with the request
     const { userId } = getAuth(request);
     
     if (!userId) {
@@ -40,31 +43,53 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-
-    const { title, subject, date, duration, description } = await request.json();
-
+    
+    // Parse the request body
+    const body = await request.json();
+    
     // Validate required fields
-    if (!title || !subject || !date || !duration) {
+    const { title, subject, date, board, class: classLevel } = body;
+    
+    if (!title || !subject || !date || !board || !classLevel) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: title, subject, and date are required' },
         { status: 400 }
       );
     }
-
-    // Insert exam into the database using db.query instead of query
+    
+    // First, let's check the actual schema of the exams table
+    try {
+      const tableInfo = await db.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'exams'"
+      );
+      console.log('Available columns in exams table:', tableInfo.rows.map(r => r.column_name));
+    } catch (err) {
+      console.log('Could not fetch table schema:', err);
+    }
+    
+    // Create a new exam in the database using direct SQL query
     const result = await db.query(
-      `INSERT INTO public.exams (user_id, title, subject, date, duration, description, created_at) 
-       VALUES ($1, $2, $3, $4, $5, $6, NOW()) 
-       RETURNING *`,
-      [userId, title, subject, date, duration, description || '']
+      `INSERT INTO exams (
+        title, subject, board, class, date, user_id, created_at
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, NOW()
+      ) RETURNING *`,
+      [
+        title,
+        subject,
+        board,
+        classLevel,
+        new Date(date),
+        userId
+      ]
     );
-
-    return NextResponse.json({ exam: result.rows[0] });
-  } catch (error) {
+    
+    return NextResponse.json(result.rows[0]);
+  } catch (error: any) {
     console.error('Error creating exam:', error);
     return NextResponse.json(
-      { error: 'Failed to create exam' },
+      { error: `Failed to create exam: ${error.message}` },
       { status: 500 }
     );
   }
-} 
+}

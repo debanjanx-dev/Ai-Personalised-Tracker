@@ -15,7 +15,7 @@ const pool = new Pool({
     }
 });
 
-// Export both connection methods
+// Export database methods
 export const db = {
     query: async (text: string, params?: any[]) => {
         try {

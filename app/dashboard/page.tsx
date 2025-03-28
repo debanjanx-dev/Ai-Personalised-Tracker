@@ -58,19 +58,27 @@ export default function Dashboard() {
 
   const handleAddExam = async (examData: any) => {
     try {
+      // Transform the data to match what the backend expects
+      // The form uses 'className' but the backend expects 'class'
+      const transformedData = {
+        ...examData,
+        class: examData.className // Map className to class as expected by backend
+      };
+      
       const response = await fetch('/api/exams', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(examData),
+        body: JSON.stringify(transformedData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setExams([data.exam, ...exams]);
+        // The API returns the exam directly, not wrapped in an exam property
+        setExams([data, ...exams]);
         setShowAddExam(false);
-        router.push(`/exams/${data.exam.id}`);
+        router.push(`/exams/${data.id}`);
       } else {
         console.error('Failed to create exam');
       }

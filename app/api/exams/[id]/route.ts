@@ -1,63 +1,168 @@
-import { query } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
 import { getAuth } from '@clerk/nextjs/server';
+import { NextRequest } from 'next/server';
 
 export async function GET(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
-    // Await the params
-    const params = await context.params;
     const { userId } = getAuth(request);
+    const { id } = context.params;
     
     if (!userId) {
       return NextResponse.json(
-        { message: "Unauthorized" },
+        { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    // Fetch exam from the database
-    const examResult = await query(
+    // Fetch exam from the database using db.query instead of query
+    const examResult = await db.query(
       "SELECT * FROM public.exams WHERE id = $1 AND user_id = $2",
-      [params.id, userId]
+      [id, userId]
     );
-    
+
     if (examResult.rows.length === 0) {
       return NextResponse.json(
-        { message: "Exam not found" },
+        { error: 'Exam not found' },
         { status: 404 }
       );
     }
 
     const exam = examResult.rows[0];
 
-    // Fetch study plan from the database
-    const studyPlanResult = await query(
+    // Fetch study plan if it exists
+    const studyPlanResult = await db.query(
       "SELECT * FROM public.study_plans WHERE exam_id = $1",
-      [params.id]
+      [id]
     );
 
     let studyPlan = null;
     if (studyPlanResult.rows.length > 0) {
+      const planData = studyPlanResult.rows[0];
       studyPlan = {
-        id: studyPlanResult.rows[0].id,
-        examId: studyPlanResult.rows[0].exam_id,
-        nodes: studyPlanResult.rows[0].nodes,
-        edges: studyPlanResult.rows[0].edges,
-        createdAt: studyPlanResult.rows[0].created_at,
+        nodes: planData.nodes,
+        edges: planData.edges
       };
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       ...exam,
       studyPlan
     });
   } catch (error) {
-    console.error("Error fetching exam:", error);
+    console.error('Error fetching exam:', error);
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { error: 'Failed to fetch exam' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  try {
+    const { userId } = getAuth(request);
+    const { id } = context.params;
+    
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const { title, subject, date, duration, description } = await request.json();
+
+    // Validate required fields
+    if (!title || !subject || !date) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Check if exam exists and belongs to user
+    const checkResult = await db.query(
+      "SELECT id FROM public.exams WHERE id = $1 AND user_id = $2",
+      [id, userId]
+    );
+
+    if (checkResult.rows.length === 0) {
+      return NextResponse.json(
+        { error: 'Exam not found or unauthorized' },
+        { status: 404 }
+      );
+    }
+
+    // Update exam
+    const result = await db.query(
+      `UPDATE public.exams 
+       SET title = $1, subject = $2, date = $3, duration = $4, description = $5
+       WHERE id = $6 AND user_id = $7
+       RETURNING *`,
+      [title, subject, date, duration, description || '', id, userId]
+    );
+
+    return NextResponse.json({ exam: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating exam:', error);
+    return NextResponse.json(
+      { error: 'Failed to update exam' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  try {
+    const { userId } = getAuth(request);
+    const { id } = context.params;
+    
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Check if exam exists and belongs to user
+    const checkResult = await db.query(
+      "SELECT id FROM public.exams WHERE id = $1 AND user_id = $2",
+      [id, userId]
+    );
+
+    if (checkResult.rows.length === 0) {
+      return NextResponse.json(
+        { error: 'Exam not found or unauthorized' },
+        { status: 404 }
+      );
+    }
+
+    // Delete associated study plan if it exists
+    await db.query(
+      "DELETE FROM public.study_plans WHERE exam_id = $1",
+      [id]
+    );
+
+    // Delete exam
+    await db.query(
+      "DELETE FROM public.exams WHERE id = $1 AND user_id = $2",
+      [id, userId]
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting exam:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete exam' },
       { status: 500 }
     );
   }

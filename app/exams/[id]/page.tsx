@@ -3,15 +3,15 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Node, Edge, NodeChange, EdgeChange, Connection } from 'reactflow';
-import ExamFlow from '@/app/components/ExamFlow';
-import { StudyPlan } from '@/app/types';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../../../card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, ArrowLeft, Save, Calendar, Clock, BookOpen, School } from "lucide-react";
+import { AlertCircle, ArrowLeft, Save, Calendar, Clock, BookOpen, School, Lightbulb } from "lucide-react";
 import { format, differenceInDays } from 'date-fns';
+import StudyInsights from '@/app/components/StudyInsights';
+import React from 'react';
 
 export default function ExamPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true);
@@ -19,12 +19,19 @@ export default function ExamPage({ params }: { params: { id: string } }) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [examData, setExamData] = useState<any>(null);
+  const [studyInsights, setStudyInsights] = useState<any>(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
   const router = useRouter();
+  
+  // Unwrap params using React.use()
+const unwrappedParams = params;
+  const examId = unwrappedParams.id;
 
+  // Fetch study plan data
   useEffect(() => {
     const fetchStudyPlan = async () => {
       try {
-        const response = await fetch(`/api/exams/${params.id}`);
+        const response = await fetch(`/api/exams/${examId}`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch study plan');
@@ -69,53 +76,46 @@ export default function ExamPage({ params }: { params: { id: string } }) {
     };
 
     fetchStudyPlan();
-  }, [params.id]);
+  }, [examId]);
 
-  const onNodesChange = useCallback((changes: NodeChange[]) => {
-    setNodes((nds) => {
-      // Apply changes to nodes
-      return changes.reduce((acc, change) => {
-        if (change.type === 'remove') {
-          return acc.filter((n) => n.id !== change.id);
+  // Fetch study insights when exam data is available
+  useEffect(() => {
+    const fetchStudyInsights = async () => {
+      if (!examData) return;
+      
+      try {
+        setInsightsLoading(true);
+        const response = await fetch('/api/insights/chapter-flow', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            subject: examData.subject,
+            examType: examData.board,
+            classLevel: examData.class
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch study insights');
         }
-        if (change.type === 'position' && change.position && change.id) {
-          return acc.map((n) => {
-            if (n.id === change.id) {
-              return { ...n, position: change.position! };
-            }
-            return n;
-          });
-        }
-        return acc;
-      }, nds);
-    });
-  }, []);
+        
+        const data = await response.json();
+        setStudyInsights(data.flowData);
+      } catch (err) {
+        console.error('Error fetching study insights:', err);
+        // Don't set error state here to avoid disrupting the main UI
+      } finally {
+        setInsightsLoading(false);
+      }
+    };
 
-  const onEdgesChange = useCallback((changes: EdgeChange[]) => {
-    setEdges((eds) => {
-      // Apply changes to edges
-      return changes.reduce((acc, change) => {
-        if (change.type === 'remove') {
-          return acc.filter((e) => e.id !== change.id);
-        }
-        return acc;
-      }, eds);
-    });
-  }, []);
-
-  const onConnect = useCallback((connection: Connection) => {
-    setEdges((eds) => {
-      // Add new edge
-      return [
-        ...eds,
-        {
-          id: `e-${connection.source}-${connection.target}`,
-          source: connection.source!,
-          target: connection.target!,
-        },
-      ];
-    });
-  }, []);
+    // Always fetch study insights when exam data is available
+    if (examData) {
+      fetchStudyInsights();
+    }
+  }, [examData]);
 
   // Calculate total study hours
   const totalHours = nodes.reduce((total, node) => {
@@ -159,6 +159,27 @@ export default function ExamPage({ params }: { params: { id: string } }) {
     );
   }
 
+  // Prepare study insights data for the component
+  const chapterInsights = studyInsights?.nodes?.map((node: any) => ({
+    id: node.id,
+    label: node.label || node.data?.label,
+    difficulty: node.difficulty || node.data?.difficulty || 'medium',
+    estimatedHours: node.estimatedHours || node.data?.estimatedHours || 3,
+    studyInsights: node.studyInsights || node.data?.studyInsights || {
+      bestPractices: ["Focus on understanding concepts", "Practice regularly"],
+      commonMistakes: ["Memorizing without understanding", "Not practicing enough"],
+      studyTechniques: ["Use flashcards", "Teach concepts to others"],
+      resourceRecommendations: ["Textbook", "Online practice problems"]
+    }
+  })) || [];
+
+  const overallStrategy = studyInsights?.overallStudyStrategy || {
+    recommendedApproach: "Start with fundamentals and build up to complex topics",
+    timeManagement: "Allocate time based on topic difficulty and your strengths/weaknesses",
+    examPreparation: "Review all topics and focus on practice tests in the final weeks",
+    practiceRecommendations: "Solve a variety of problems to build confidence"
+  };
+
   return (
     <div className="min-h-screen bg-gray-950 pt-20 px-4 pb-10">
       <div className="max-w-7xl mx-auto">
@@ -184,20 +205,33 @@ export default function ExamPage({ params }: { params: { id: string } }) {
           </div>
         </div>
         
-        <Tabs defaultValue="flow" className="mb-8">
+        <Tabs defaultValue="insights" className="mb-8">
           <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="flow">Visual Flow</TabsTrigger>
+            <TabsTrigger value="insights">Study Insights</TabsTrigger>
             <TabsTrigger value="stats">Study Stats</TabsTrigger>
           </TabsList>
-          <TabsContent value="flow" className="mt-4">
-            <ExamFlow 
-              nodes={nodes} 
-              edges={edges} 
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-            />
+          
+          <TabsContent value="insights" className="mt-4">
+            <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+              <h2 className="text-xl font-semibold text-white mb-4">Study Insights</h2>
+              {insightsLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-32 w-full" />
+                  <Skeleton className="h-64 w-full" />
+                </div>
+              ) : chapterInsights.length > 0 ? (
+                <StudyInsights 
+                  chapterInsights={chapterInsights}
+                  overallStrategy={overallStrategy}
+                />
+              ) : (
+                <div className="w-full h-64 flex items-center justify-center bg-gray-800/30 rounded-lg border border-gray-700/50">
+                  <p className="text-gray-400">No study insights available</p>
+                </div>
+              )}
+            </div>
           </TabsContent>
+          
           <TabsContent value="stats" className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
@@ -206,7 +240,9 @@ export default function ExamPage({ params }: { params: { id: string } }) {
                   <CardDescription>Estimated hours needed</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-4xl font-bold text-blue-500">{totalHours} hours</div>
+                  <div className="text-4xl font-bold text-blue-500">
+                    {chapterInsights.reduce((total: number, chapter: { estimatedHours: number }) => total + chapter.estimatedHours, 0)} hours
+                  </div>
                 </CardContent>
               </Card>
               
@@ -217,7 +253,9 @@ export default function ExamPage({ params }: { params: { id: string } }) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-4xl font-bold text-green-500">
-                    {daysUntilExam > 0 ? Math.ceil(totalHours / daysUntilExam) : totalHours} hours/day
+                    {daysUntilExam > 0 ? 
+                      Math.ceil(chapterInsights.reduce((total: number, chapter: { estimatedHours: number }) => total + chapter.estimatedHours, 0) / daysUntilExam) :
+                      chapterInsights.reduce((total: number, chapter: { estimatedHours: number }) => total + chapter.estimatedHours, 0)} hours/day
                   </div>
                 </CardContent>
               </Card>
@@ -228,7 +266,9 @@ export default function ExamPage({ params }: { params: { id: string } }) {
                   <CardDescription>Total study areas</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-4xl font-bold text-purple-500">{nodes.length}</div>
+                  <div className="text-4xl font-bold text-purple-500">
+                    {chapterInsights.length}
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -259,4 +299,4 @@ export default function ExamPage({ params }: { params: { id: string } }) {
       </div>
     </div>
   );
-} 
+}
