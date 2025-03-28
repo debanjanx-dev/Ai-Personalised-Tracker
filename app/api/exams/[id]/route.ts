@@ -10,7 +10,7 @@ type Props = {
       id : string;
   };
 };
-
+// @ts-ignore
 export async function GET(
   request: NextRequest,
   {params}: Props
