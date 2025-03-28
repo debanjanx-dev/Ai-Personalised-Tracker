@@ -1,23 +1,16 @@
 // @ts-ignore
 
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuth } from '@clerk/nextjs/server';
-import { NextRequest } from 'next/server';
 
-type Props = {
-  params : {
-      id : string;
-  };
-};
-// @ts-ignore
 export async function GET(
   request: NextRequest,
-  {params}: Props
+  context: { params: Record<string, string> }
 ) {
   try {
     const { userId } = getAuth(request);
-    const id = params.id;
+    const id = context.params.id;
     
     if (!userId) {
       return NextResponse.json(
@@ -71,7 +64,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  {params}: Props
+  {params}: { params: { id: string } }
 ) {
   try {
     const { userId } = getAuth(request);
@@ -128,7 +121,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  {params}: Props
+  {params}: { params: { id: string } }
 ) {
   try {
     const { userId } = getAuth(request);
