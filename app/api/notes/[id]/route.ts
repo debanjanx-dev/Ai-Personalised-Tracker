@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: any }>}
 ) {
   try {
     const { userId } = getAuth(request);
@@ -17,7 +17,7 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
     
     const note = await db.query(
       'SELECT * FROM notes WHERE id = $1 AND user_id = $2',
@@ -43,7 +43,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: any }>}
 ) {
   try {
     const { userId } = getAuth(request);
@@ -55,7 +55,7 @@ export async function PUT(
       );
     }
 
-    const { id } = params;
+    const { id } =await params;
     const { title, content, tags, color } = await request.json();
 
     // First check if the note exists and belongs to the user
@@ -98,7 +98,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: any }>}
 ) {
   try {
     const { userId } = getAuth(request);
@@ -110,7 +110,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
     
     // First check if the note exists and belongs to the user
     const existingNote = await db.query(

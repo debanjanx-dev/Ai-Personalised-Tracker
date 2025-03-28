@@ -30,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* @ts-expect-error - ClerkProvider is a valid Server Component */}
+      
         <ClerkProvider>
           <HeroUIProvider>
             <Navbar />

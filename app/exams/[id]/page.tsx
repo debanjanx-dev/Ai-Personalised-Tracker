@@ -13,7 +13,7 @@ import { format, differenceInDays } from 'date-fns';
 import StudyInsights from '@/app/components/StudyInsights';
 import React from 'react';
 
-export default function ExamPage({ params }: { params: { id: string } }) {
+export default function ExamPage({ params }: { params: Promise<{ id: string }> }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -24,8 +24,8 @@ export default function ExamPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   
   // Unwrap params using React.use()
-const unwrappedParams = params;
-  const examId = unwrappedParams.id;
+
+  const examId = React.use(params).id;
 
   // Fetch study plan data
   useEffect(() => {

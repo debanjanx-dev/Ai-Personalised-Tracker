@@ -1,4 +1,4 @@
-import { query } from '../lib/db';
+import { db } from '../lib/db';
 import fs from 'fs';
 import path from 'path';
 
@@ -18,7 +18,7 @@ async function runMigrations() {
       const filePath = path.join(migrationsDir, file);
       const sql = fs.readFileSync(filePath, 'utf8');
       
-      await query(sql);
+      await db.query(sql);
       console.log(`Migration ${file} completed successfully`);
     }
     

@@ -12,7 +12,7 @@ export async function GET(
 ) {
   try {
     const { userId } = getAuth(request);
-    const id =  (await params).id;
+    const {id} =  await params;
     
     if (!userId) {
       return NextResponse.json(
@@ -66,11 +66,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  {params}: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }>}
 ) {
   try {
     const { userId } = getAuth(request);
-    const id = params.id;
+    const {id} = await params;
     
     if (!userId) {
       return NextResponse.json(
@@ -123,11 +123,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  {params}: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }>}
 ) {
   try {
     const { userId } = getAuth(request);
-    const { id } = params;
+    const { id } = await params;
     
     if (!userId) {
       return NextResponse.json(
