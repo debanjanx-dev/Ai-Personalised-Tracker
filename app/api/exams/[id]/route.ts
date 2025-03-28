@@ -13,9 +13,10 @@ interface RequestContext {
 }
 
 // Fix for the GET function - you need to replace slug with id
+// Remove the custom interface and use the exact pattern Next.js expects
 export async function GET(
   request: NextRequest,
-  { params }: RequestContext
+  { params }: { params: { id: string } }
 ) {
   try {
     const { userId } = getAuth(request);
@@ -73,7 +74,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: RequestContext
+  { params }: { params: { id: string } }
 ) {
   try {
     const { userId } = getAuth(request);
@@ -130,7 +131,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: RequestContext
+  { params }: { params: { id: string } }
 ) {
   try {
     const { userId } = getAuth(request);
