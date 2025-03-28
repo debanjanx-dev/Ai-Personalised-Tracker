@@ -5,22 +5,13 @@ import { db } from '@/lib/db';
 import { getAuth } from '@clerk/nextjs/server';
 import { NextRequest } from 'next/server';
 
-// Update the type definition to match Next.js expectations
-interface RequestContext {
-  params: {
-    id: string; // Use id since the folder is named [id]
-  }
-}
-
-// Fix for the GET function - you need to replace slug with id
-// Remove the custom interface and use the exact pattern Next.js expects
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const { userId } = getAuth(request);
-    const id = params.id;
+    const { id } = context.params;
     
     if (!userId) {
       return NextResponse.json(
@@ -29,10 +20,10 @@ export async function GET(
       );
     }
 
-    // Fetch exam from the database using db.query instead of query
+    // Fetch exam from the database
     const examResult = await db.query(
       "SELECT * FROM public.exams WHERE id = $1 AND user_id = $2",
-      [id, userId]  // Changed from slug to id
+      [id, userId]
     );
 
     if (examResult.rows.length === 0) {
@@ -74,11 +65,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const { userId } = getAuth(request);
-    const id = params.id;
+    const { id } = context.params;
     
     if (!userId) {
       return NextResponse.json(
@@ -131,11 +122,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const { userId } = getAuth(request);
-    const id = params.id;
+    const { id } = context.params;
     
     if (!userId) {
       return NextResponse.json(
