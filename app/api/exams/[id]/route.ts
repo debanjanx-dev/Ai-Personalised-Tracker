@@ -5,20 +5,20 @@ import { db } from '@/lib/db';
 import { getAuth } from '@clerk/nextjs/server';
 import { NextRequest } from 'next/server';
 
-// Define context type
+// Define context type with slug instead of id
 type Context = {
   params: {
-    id: string;
+    slug: string;
   };
 };
 
 export async function GET(
   request: NextRequest,
-  context: any 
+  context: Context 
 ) {
   try {
     const { userId } = getAuth(request);
-    const { id } = context.params;
+    const { slug } = context.params; // Use slug instead of id
     
     if (!userId) {
       return NextResponse.json(
@@ -30,7 +30,7 @@ export async function GET(
     // Fetch exam from the database using db.query instead of query
     const examResult = await db.query(
       "SELECT * FROM public.exams WHERE id = $1 AND user_id = $2",
-      [id, userId]
+      [slug, userId] // Use slug instead of id
     );
 
     if (examResult.rows.length === 0) {
@@ -45,7 +45,7 @@ export async function GET(
     // Fetch study plan if it exists
     const studyPlanResult = await db.query(
       "SELECT * FROM public.study_plans WHERE exam_id = $1",
-      [id]
+      [slug] // Use slug instead of id
     );
 
     let studyPlan = null;
@@ -72,11 +72,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: any
+  context: Context
 ) {
   try {
     const { userId } = getAuth(request);
-    const { id } = context.params;
+    const { slug } = context.params; // Use slug instead of id
     
     if (!userId) {
       return NextResponse.json(
@@ -98,7 +98,7 @@ export async function PUT(
     // Check if exam exists and belongs to user
     const checkResult = await db.query(
       "SELECT id FROM public.exams WHERE id = $1 AND user_id = $2",
-      [id, userId]
+      [slug, userId] // Use slug instead of id
     );
 
     if (checkResult.rows.length === 0) {
@@ -114,7 +114,7 @@ export async function PUT(
        SET title = $1, subject = $2, date = $3, duration = $4, description = $5
        WHERE id = $6 AND user_id = $7
        RETURNING *`,
-      [title, subject, date, duration, description || '', id, userId]
+      [title, subject, date, duration, description || '', slug, userId] // Use slug instead of id
     );
 
     return NextResponse.json({ exam: result.rows[0] });
@@ -129,11 +129,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: any
+  context: Promise<Context>
 ) {
   try {
     const { userId } = getAuth(request);
-    const { id } = context.params;
+    const resolvedContext = await context;
+    const { slug } = resolvedContext.params;
     
     if (!userId) {
       return NextResponse.json(
@@ -145,7 +146,7 @@ export async function DELETE(
     // Check if exam exists and belongs to user
     const checkResult = await db.query(
       "SELECT id FROM public.exams WHERE id = $1 AND user_id = $2",
-      [id, userId]
+      [slug, userId]
     );
 
     if (checkResult.rows.length === 0) {
@@ -158,13 +159,13 @@ export async function DELETE(
     // Delete associated study plan if it exists
     await db.query(
       "DELETE FROM public.study_plans WHERE exam_id = $1",
-      [id]
+      [slug] // Changed from id to slug
     );
 
     // Delete exam
     await db.query(
       "DELETE FROM public.exams WHERE id = $1 AND user_id = $2",
-      [id, userId]
+      [slug, userId] // Changed from id to slug
     );
 
     return NextResponse.json({ success: true });
