@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, BookOpen, Brain, BarChart } from 'lucide-react';
 import ChapterQuiz from '@/app/components/ChapterQuiz';
-// import { useToast } from '@heroui/react';
 import { useToast } from '@/hooks/use-toast';
 
-export default function QuizzesPage() {
+// Create a client component that uses useSearchParams
+function QuizzesContent() {
   const [exams, setExams] = useState<any[]>([]);
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -303,5 +303,18 @@ export default function QuizzesPage() {
         </Tabs>
       </div>
     </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function QuizzesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black w-full flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      </div>
+    }>
+      <QuizzesContent />
+    </Suspense>
   );
 }
