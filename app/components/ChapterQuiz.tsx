@@ -287,9 +287,27 @@ export default function ChapterQuiz({ examId, subject, chapter, difficulty = 'me
             className="space-y-3"
           >
             {currentQuestion?.options.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2 border border-neutral-800 p-3 rounded-md bg-gray-900/30 hover:bg-gray-800/50 transition-colors">
-                <RadioGroupItem value={option} id={`option-${index}`} />
-                <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer text-gray-300">
+              <div 
+                key={index} 
+                className={`flex items-center space-x-2 border p-3 rounded-md transition-colors ${
+                  selectedAnswers[currentQuestion?.id] === option 
+                    ? "bg-blue-900/50 border-blue-500" 
+                    : "bg-gray-900/30 border-neutral-800 hover:bg-gray-800/50"
+                }`}
+              >
+                <RadioGroupItem 
+                  value={option} 
+                  id={`option-${index}`} 
+                  className={selectedAnswers[currentQuestion?.id] === option ? "border-blue-500" : ""}
+                />
+                <Label 
+                  htmlFor={`option-${index}`} 
+                  className={`flex-1 cursor-pointer ${
+                    selectedAnswers[currentQuestion?.id] === option 
+                      ? "text-blue-100" 
+                      : "text-gray-300"
+                  }`}
+                >
                   {option}
                 </Label>
               </div>
