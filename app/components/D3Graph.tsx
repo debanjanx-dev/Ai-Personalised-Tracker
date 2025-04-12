@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 
 // Add these interfaces for TypeScript
@@ -19,6 +19,26 @@ interface ChapterInsight {
   studyInsights: StudyInsight;
 }
 
+interface NodeData {
+  id: string;
+  label: string;
+  difficulty: string;
+  estimatedHours: number;
+  step: number;
+  insights: StudyInsight;
+  level: number;
+  group: number;
+  x?: number;
+  y?: number;
+}
+
+interface LinkData {
+  source: string | NodeData;
+  target: string | NodeData;
+  value: number;
+  primary: boolean;
+}
+
 interface D3StudyGraphProps {
   chapterInsights: ChapterInsight[];
 }
@@ -26,6 +46,29 @@ interface D3StudyGraphProps {
 const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
   // Add proper type to the ref
   const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  
+  // Function to update dimensions based on container size
+  const updateDimensions = () => {
+    if (containerRef.current) {
+      const width = containerRef.current.clientWidth;
+      // Adjust height based on width for mobile responsiveness
+      const height = width < 600 ? 500 : 600;
+      setDimensions({ width, height });
+    }
+  };
+  
+  // Effect to handle resize
+  useEffect(() => {
+    updateDimensions();
+    const handleResize = () => {
+      updateDimensions();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   useEffect(() => {
     if (!chapterInsights?.length || !svgRef.current) return;
@@ -34,12 +77,19 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
     d3.select(svgRef.current).selectAll("*").remove();
     
     const svg = d3.select(svgRef.current);
-    const width = 800;
-    const height = 600;
-    const margin = { top: 80, right: 80, bottom: 80, left: 80 };
+    const width = dimensions.width;
+    const height = dimensions.height;
+    
+    // Calculate margins based on screen size
+    const margin = { 
+      top: width < 500 ? 40 : 80, 
+      right: width < 500 ? 20 : 80, 
+      bottom: width < 500 ? 40 : 80, 
+      left: width < 500 ? 20 : 80 
+    };
     
     // Create nodes data
-    const nodes = chapterInsights.map((chapter, i) => ({
+    const nodes: NodeData[] = chapterInsights.map((chapter, i) => ({
       id: chapter.id.toString(),
       label: chapter.label,
       difficulty: chapter.difficulty,
@@ -52,7 +102,7 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
     }));
     
     // Create links between nodes that represent dependencies
-    const links = [];
+    const links: LinkData[] = [];
     
     // Traditional sequential links - use node objects instead of indices
     for (let i = 0; i < nodes.length - 1; i++) {
@@ -85,13 +135,12 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
     }
     
     // Create a hierarchical force simulation
-    // @ts-ignore
-    const simulation = d3.forceSimulation(nodes)
-      .force("link", d3.forceLink(links)
+    const simulation = d3.forceSimulation(nodes as any)
+      .force("link", d3.forceLink(links as any)
         .id((d: any) => d.id)
-        .distance((d: any) => d.primary ? 100 : 170)
+        .distance((d: any) => d.primary ? (width < 500 ? 70 : 100) : (width < 500 ? 120 : 170))
         .strength((d: any) => d.primary ? 0.8 : 0.3))
-      .force("charge", d3.forceManyBody().strength(-500))
+      .force("charge", d3.forceManyBody().strength(width < 500 ? -300 : -500))
       .force("center", d3.forceCenter(width / 2, height / 2))
       .force("x", d3.forceX(width / 2).strength(0.05))
       .force("y", d3.forceY(height / 2).strength(0.05));
@@ -113,11 +162,11 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
     svg.append("defs").append("marker")
       .attr("id", "arrowhead-primary")
       .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 20)
+      .attr("refX", width < 500 ? 15 : 20)
       .attr("refY", 0)
       .attr("orient", "auto")
-      .attr("markerWidth", 6)
-      .attr("markerHeight", 6)
+      .attr("markerWidth", width < 500 ? 5 : 6)
+      .attr("markerHeight", width < 500 ? 5 : 6)
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
       .attr("fill", "#4f46e5");
@@ -126,11 +175,11 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
     svg.append("defs").append("marker")
       .attr("id", "arrowhead-secondary")
       .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 20)
+      .attr("refX", width < 500 ? 15 : 20)
       .attr("refY", 0)
       .attr("orient", "auto")
-      .attr("markerWidth", 5)
-      .attr("markerHeight", 5)
+      .attr("markerWidth", width < 500 ? 4 : 5)
+      .attr("markerHeight", width < 500 ? 4 : 5)
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
       .attr("fill", "#6b7280");
@@ -141,7 +190,7 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
       .data(links)
       .join("line")
       .attr("stroke", (d: any) => d.primary ? "#4f46e5" : "#6b7280")
-      .attr("stroke-width", (d: any) => d.primary ? 3 : 1.5)
+      .attr("stroke-width", (d: any) => d.primary ? (width < 500 ? 2 : 3) : (width < 500 ? 1 : 1.5))
       .attr("stroke-dasharray", (d: any) => d.primary ? null : "5,5")
       .attr("marker-end", (d: any) => d.primary ? "url(#arrowhead-primary)" : "url(#arrowhead-secondary)");
     
@@ -150,11 +199,10 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
       .selectAll("g")
       .data(nodes)
       .join("g")
-      // @ts-ignore
-      .call(d3.drag()
+      .call(d3.drag<SVGGElement, NodeData>()
         .on("start", dragstarted as any)
         .on("drag", dragged as any)
-        .on("end", dragended as any));
+        .on("end", dragended as any) as any);
     
     // Add circles to node groups with difficulty colors
     const difficultyColors = {
@@ -163,17 +211,21 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
       hard: '#ef4444'
     };
     
+    // Calculate node size based on screen width
+    const nodeSize = width < 500 ? 30 : 45;
+    const outerNodeSize = width < 500 ? 35 : 50;
+    
     // Add larger background circle for visual emphasis
     node.append("circle")
-      .attr("r", 50)
+      .attr("r", outerNodeSize)
       .attr("fill", "#1e293b")
       .attr("opacity", 0.7);
     
     node.append("circle")
-      .attr("r", 45)
+      .attr("r", nodeSize)
       .attr("fill", (d: any) => difficultyColors[d.difficulty] || "#4f46e5")
       .attr("stroke", "#1e293b")
-      .attr("stroke-width", 3);
+      .attr("stroke-width", width < 500 ? 2 : 3);
     
     // Add step numbers to nodes
     node.append("text")
@@ -181,24 +233,28 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
       .attr("dy", ".3em")
       .attr("fill", "white")
       .attr("font-weight", "bold")
-      .attr("font-size", "22px")
+      .attr("font-size", width < 500 ? "16px" : "22px")
       .text((d: any) => d.step);
     
     // Add topic labels below nodes
     node.append("text")
       .attr("text-anchor", "middle")
-      .attr("y", 65)
+      .attr("y", outerNodeSize + 15)
       .attr("fill", "white")
-      .attr("font-size", "14px")
+      .attr("font-size", width < 500 ? "12px" : "14px")
       .attr("font-weight", "medium")
-      .text((d: any) => d.label.length > 20 ? d.label.substring(0, 18) + "..." : d.label);
+      .text((d: any) => {
+        // Shorten text more on smaller screens
+        const maxLength = width < 500 ? 12 : 20;
+        return d.label.length > maxLength ? d.label.substring(0, maxLength - 2) + "..." : d.label;
+      });
     
     // Add hours text
     node.append("text")
       .attr("text-anchor", "middle")
-      .attr("y", 85)
+      .attr("y", outerNodeSize + (width < 500 ? 30 : 35))
       .attr("fill", "white")
-      .attr("font-size", "12px")
+      .attr("font-size", width < 500 ? "10px" : "12px")
       .text((d: any) => `${d.estimatedHours} hours`);
     
     // Create tooltips
@@ -212,7 +268,7 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
       .style("border-radius", "5px")
       .style("border", "1px solid #6b7280")
       .style("font-size", "12px")
-      .style("max-width", "250px")
+      .style("max-width", width < 500 ? "200px" : "250px")
       .style("box-shadow", "0 10px 15px -3px rgba(0, 0, 0, 0.1)")
       .style("z-index", "10");
     
@@ -239,60 +295,63 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
       tooltip.style("visibility", "hidden");
     });
     
-    // Add legend for link types
+    // Add legend for link types with responsive positioning
+    const legendY = width < 500 ? 20 : 30;
     const legend = svg.append("g")
-      .attr("transform", `translate(${width - 200}, 30)`);
+      .attr("transform", `translate(${width - (width < 500 ? 150 : 200)}, ${legendY})`);
     
+    // Add responsive sized background
     legend.append("rect")
-      .attr("width", 180)
-      .attr("height", 80)
+      .attr("width", width < 500 ? 140 : 180)
+      .attr("height", width < 500 ? 60 : 80)
       .attr("fill", "#1e293b")
       .attr("rx", 5)
-      .attr("ry", 5)
-      .attr("opacity", 0.8);
+      .attr("opacity", 0.9);
     
+    // Add legend title
     legend.append("text")
-      .attr("x", 10)
-      .attr("y", 20)
+      .attr("x", width < 500 ? 10 : 15)
+      .attr("y", width < 500 ? 15 : 20)
       .attr("fill", "white")
-      .attr("font-size", "12px")
+      .attr("font-size", width < 500 ? "10px" : "12px")
       .attr("font-weight", "bold")
-      .text("Study Path Legend");
+      .text("Connection Types");
     
-    // Primary path legend
+    // Add legend items with responsive spacing
+    // Primary connection
     legend.append("line")
-      .attr("x1", 10)
-      .attr("y1", 40)
-      .attr("x2", 50)
-      .attr("y2", 40)
+      .attr("x1", width < 500 ? 10 : 15)
+      .attr("y1", width < 500 ? 30 : 40)
+      .attr("x2", width < 500 ? 40 : 55)
+      .attr("y2", width < 500 ? 30 : 40)
       .attr("stroke", "#4f46e5")
-      .attr("stroke-width", 3);
+      .attr("stroke-width", width < 500 ? 2 : 3);
     
     legend.append("text")
-      .attr("x", 60)
-      .attr("y", 44)
+      .attr("x", width < 500 ? 45 : 65)
+      .attr("y", width < 500 ? 33 : 43)
       .attr("fill", "white")
-      .attr("font-size", "10px")
-      .text("Main sequence");
+      .attr("font-size", width < 500 ? "8px" : "10px")
+      .text("Direct Sequence");
     
-    // Secondary path legend
+    // Secondary connection
     legend.append("line")
-      .attr("x1", 10)
-      .attr("y1", 60)
-      .attr("x2", 50)
-      .attr("y2", 60)
+      .attr("x1", width < 500 ? 10 : 15)
+      .attr("y1", width < 500 ? 45 : 60)
+      .attr("x2", width < 500 ? 40 : 55)
+      .attr("y2", width < 500 ? 45 : 60)
       .attr("stroke", "#6b7280")
-      .attr("stroke-width", 1.5)
-      .attr("stroke-dasharray", "5,5");
+      .attr("stroke-width", width < 500 ? 1 : 1.5)
+      .attr("stroke-dasharray", "3,3");
     
     legend.append("text")
-      .attr("x", 60)
-      .attr("y", 64)
+      .attr("x", width < 500 ? 45 : 65)
+      .attr("y", width < 500 ? 48 : 63)
       .attr("fill", "white")
-      .attr("font-size", "10px")
-      .text("Related topics");
+      .attr("font-size", width < 500 ? "8px" : "10px")
+      .text("Topic Relation");
     
-    // Update positions on each tick
+    // Update the position of links in the simulation
     simulation.on("tick", () => {
       link
         .attr("x1", (d: any) => d.source.x)
@@ -300,11 +359,10 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
         .attr("x2", (d: any) => d.target.x)
         .attr("y2", (d: any) => d.target.y);
       
-      node
-        .attr("transform", (d: any) => `translate(${d.x}, ${d.y})`);
+      node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
     });
     
-    // Drag functions
+    // Drag functions with proper types
     function dragstarted(event: any, d: any) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       d.fx = d.x;
@@ -318,28 +376,27 @@ const D3StudyGraph: React.FC<D3StudyGraphProps> = ({ chapterInsights }) => {
     
     function dragended(event: any, d: any) {
       if (!event.active) simulation.alphaTarget(0);
-      // Keep nodes in place after dragging for better user control
-      // Comment these out if you want nodes to resume floating
-      // d.fx = null;
-      // d.fy = null;
+      d.fx = null;
+      d.fy = null;
     }
     
-    // Run simulation with higher alpha for better layout
-    simulation.alpha(1).restart();
-    
-    // Modify your simulation to reduce movement
-    simulation.alphaDecay(0.1);
-    simulation.velocityDecay(0.5);
-    
-    // Cleanup
+    // Clean up when component unmounts
     return () => {
+      simulation.stop();
       d3.select("body").selectAll(".tooltip").remove();
     };
-  }, [chapterInsights]);
+  }, [chapterInsights, dimensions]);
   
   return (
-    <div className="w-full h-[600px] overflow-hidden border border-gray-800 rounded-xl bg-gray-900">
-      <svg ref={svgRef} width="100%" height="100%"></svg>
+    <div className="w-full h-full" ref={containerRef}>
+      <svg 
+        ref={svgRef} 
+        width={dimensions.width} 
+        height={dimensions.height}
+        viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
+        preserveAspectRatio="xMidYMid meet"
+        className="w-full h-auto"
+      />
     </div>
   );
 };

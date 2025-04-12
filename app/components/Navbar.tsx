@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Home, BookOpen, StickyNote, BarChart } from "lucide-react";
+import { Menu, X, Home, BookOpen, StickyNote, BarChart, BookCheck } from "lucide-react";
 import { usePathname } from 'next/navigation';
 import { SignInButton, UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
@@ -29,6 +29,7 @@ const Navbar = () => {
     { name: 'Home', path: '/', icon: <Home className="h-5 w-5" /> },
     { name: 'Dashboard', path: '/dashboard', icon: <BarChart className="h-5 w-5" /> },
     { name: 'Exams', path: '/exams', icon: <BookOpen className="h-5 w-5" /> },
+    { name: 'Quizzes', path: '/quizzes', icon: <BookCheck className="h-5 w-5" /> },
     { name: 'Notes', path: '/notes', icon: <StickyNote className="h-5 w-5" /> },
   ];
 
