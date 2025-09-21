@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X, Home, BookOpen, StickyNote, BarChart, BookCheck } from "lucide-react";
 import { usePathname } from 'next/navigation';
 import { SignInButton, UserButton } from "@clerk/nextjs";
@@ -10,9 +10,13 @@ import { useUser } from "@clerk/nextjs";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted , setMounted] = useState(false);
   const pathname = usePathname();
   const { isSignedIn } = useUser();
 
+ useEffect(() => {
+    setMounted(true);
+  }, []);
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -33,8 +37,16 @@ const Navbar = () => {
     { name: 'Notes', path: '/notes', icon: <StickyNote className="h-5 w-5" /> },
   ];
 
+  if(!mounted){
+    return(
+      <nav className="fixed top-0 w-full z-50">
+        <div className="h-16 bg-black" /> 
+      </nav>
+    )
+  }
+
   return (
-    <nav className="fixed top-0 w-full z-50 bg-black border-b border-neutral-800">
+    <nav className="relative top-0 w-full z-50 bg-black">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Logo */}

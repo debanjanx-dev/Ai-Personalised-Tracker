@@ -4,6 +4,7 @@ import { WavyBackground } from './components/ui/wavy-background';
 import { FeaturesSectionDemo } from './components/Features-Section';
 import { Timeline } from './components/ui/timeline';
 import { Spotlight } from './components/ui/spotlight-new';
+import { Navbar } from '@heroui/react';
 
 const timelineData = [
   {
@@ -55,7 +56,6 @@ const timelineData = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-black">
-      
       {/* Hero Section */}
       <section className="pt-18">
         <WavyBackground className="max-w-6xl mx-auto px-4">
@@ -89,7 +89,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="w-full -mt-20">
+      <section className="w-full mt-20">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-blue-500 to-blue-400">
             Features You Won't Find Anywhere Else

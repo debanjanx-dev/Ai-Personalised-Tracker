@@ -26,15 +26,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="overflow-x-hidden">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-      
         <ClerkProvider>
+          <Navbar />
           <HeroUIProvider>
-            <Navbar />
-            <main className="min-h-[calc(100vh-60px)] pt-16">
+            <main>
               {children}
             </main>
           </HeroUIProvider>
