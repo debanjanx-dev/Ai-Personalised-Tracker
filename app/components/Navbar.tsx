@@ -32,7 +32,7 @@ const Navbar = () => {
   const navItems = [
     { name: 'Home', path: '/', icon: <Home className="h-5 w-5" /> },
     { name: 'Dashboard', path: '/dashboard', icon: <BarChart className="h-5 w-5" /> },
-    { name: 'Exams', path: '/exams', icon: <BookOpen className="h-5 w-5" /> },
+    // { name: 'Exams', path: '/exams', icon: <BookOpen className="h-5 w-5" /> },
     { name: 'Quizzes', path: '/quizzes', icon: <BookCheck className="h-5 w-5" /> },
     { name: 'Notes', path: '/notes', icon: <StickyNote className="h-5 w-5" /> },
   ];

@@ -20,8 +20,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { 
   PlusCircle, 
   BookOpen, 
-  Calendar, 
-  School, 
   GraduationCap
 } from 'lucide-react';
 import {
